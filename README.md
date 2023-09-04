@@ -13,8 +13,8 @@ Overview Diagram:
 
 •	Create a log repository in azure, log analytics workspace, which used to ingest the log from the VM using PowerShell to transform logs.
 
-  o	Reason why use PowerShell is because in windows’ log only shows IP address of the source of the attack but not the geolocation.
+  * Reason why use PowerShell is because in windows’ log only shows IP address of the source of the attack but not the geolocation.
   
-  o	I will use the PowerShell to extract the IP address from the Windows’ log and send it through third party API to obtain the country, state, and province and send the custom log with geographic data send it back to VM.
+  * I will use the PowerShell to extract the IP address from the Windows’ log and send it through third party API to obtain the country, state, and province and send the custom log with geographic data send it back to VM.
   
 •	And setup azure sentinel (SIEM), which it will be used to create a map with data of origin of the attack on the honeypot.
