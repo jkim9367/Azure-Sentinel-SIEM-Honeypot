@@ -74,3 +74,121 @@ Click “create”
 
 # Create Log Analytics Workspace
 
+Purpose of creating log analytics workspace is to ingest logs from the VM’s window’s event logs and feed it through the custom log with geographic information and Azure SIEM will connect to this log analytics workspace to display geodata.
+In the search of azure, look up “log analytics workspace”
+Click “create log analytic workspace”
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/7921f554-3200-49fa-b3f6-8044f6758148)
+
+
+In resource group. Select “honeypotproject”
+Name “LAW-honeypot”
+Region “West US 2”
+Click “review create”
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/25579fc1-f337-4061-bf37-a1539ce45114)
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/bcfd2b0d-23b0-481b-bc83-e260dccb4f35)
+
+
+Enable ability to gather logs from VM in security center
+In Azure’s search bar, look up “security center” 
+In the left tab, click “pricing & settings” 
+Click “LAW-honeypot”
+Click “Azure defender on” to turn on the defender on
+Under “Azure defender for”, click off on “SQL server on machines”
+Click save
+On left pane, click “data collection”
+ Select “all event” and save.
+
+
+# Connect Log Analytics Workspace to the Virtual Machine
+
+In the Azure search bar, go to “log analytics workspace”
+Click “LAW-honeypot”
+On left pane, click “virtual machine”
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/ddf2cbb3-68f6-4ff5-9ab7-0d701ca02833)
+
+
+Select “honeypot-vm”
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/a0a01cd5-0211-4cdd-bcd5-00fcf8f53df3)
+
+
+Click connect
+
+
+# Setting Up SIEM
+
+In the Azure search bar, search “sentinel”
+Click create Azure Sentinel 
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/06f01114-14f9-443c-a601-1f2c9d6ffc44)
+
+
+Select “LAW-honeypot” and click “add”
+
+
+#Accessing Virtual Machine
+
+Search virtual machine in azure and copy the “public IP address”
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/466a3a89-e65b-46c4-963b-8cf9d4f21628)
+
+
+From host machine, open “remote desktop connection”
+Paste the Ip address and log in with credential with user create earlier.
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/182aa2cd-d7f3-49ea-ac37-a221da1826fd)
+
+
+Before logging in, I will attempt to login with wrong login twice.
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/17b75cf6-f087-48ee-ae4f-2fa2259c15ed)
+
+
+Logging in:
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/7c4f823b-4a1e-4839-ba93-bf662122b9d9)
+
+
+Go back to “remote desktop connection” on the host machine and purposefully fail attempt login to view it in the windows event log.
+
+In the VM, go to “event viewer” – go to “Windows logs” – “Security”
+Need to wait until event load.
+
+This is all logs for this VM
+
+I going to pay attention on event ID 4625 which is failed login attempts.
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/a7def601-cdd7-4745-9f46-c14e5391afa5)
+
+
+If you double click the failed attempt, you can see the IP address in the “network information” –> "source network address"
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/48d95c17-26ef-49fb-8dbb-ae50c591fc90)
+
+
+But you can not view any geolocation, so I will use API and PowerScript to program this process.
+I will use ipgeolocation.io to do this.
+And use Sentinel (SEIM) to read latitude and longitude and plot the attackers in the map.
+Here is the example:
+
+
+![image](https://github.com/jkim9367/Azure_Sentinel_SIEM_Honeypot/assets/121040101/f4c01b7d-ca84-46dc-ab50-41cca5af8b64)
+
+
+# Turn Off the Firewall of the VM
+
