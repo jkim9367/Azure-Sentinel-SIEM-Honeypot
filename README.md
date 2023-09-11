@@ -212,3 +212,118 @@ If it is able to ping, it means firewall has been successfully turned off and it
 
 
 
+# PowerShell code extract the IP of the attacker.
+
+I will use the PowerShell to extract the IP address from the Windows’ log and send it through third party API to obtain the country, state, and province and send the custom log with geographic data send it back to VM.
+
+Here is the PowerShell script  
+Save it as “Log_Exporter”
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/c789737b-74c1-4407-9afc-fc6cd202d051)
+
+
+Sign up and get api key in the “https://ipgeolocation.io/”
+What it does: 
+It looks through the security event and get all failed attempts and put it in separate log files.
+
+Running the PowerShell:
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/078c9da5-e28b-40a3-8b4f-ed5ede9f5850)
+
+
+Once this program runs, it will create log file that only contains failed login attempts 
+It will in “C:” -> “ProgramData” -> “failed_rdp” text file
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/2d49b087-7938-4636-9cfd-d336ddf06f52)
+
+
+Inside of the log:
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/b98aca3a-b85d-4a00-9b39-e12903e980d1)
+
+
+
+Inside, there is sample log because we need to use it to train analytics workspace. When I am using the log in the map, I am going to exclude all sample in the query later.
+Last 2 failed login attempts are mine.
+And rest are sample failed attempts.
+
+This PowerShell is live, so it I fail login attempt, it will log it current time.
+
+
+# Creating custom log in Log analytics workspace to bring in the custom log
+
+
+In the azure, go to log analytics workspace and click LAW-honeypot
+ 
+In the Azure portal, select Log “Analytics workspaces” -> your workspace -> “Tables”.
+
+Select “Create and then New custom log (MMA-based)”:
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/6218e9b2-b5a3-4860-9c2d-88839f55385f)
+
+
+First, need log file. For  the “Sample”, Go to the VM and copy and paste the log from the text file in the “C: -> “ProgramData” -> “failed_rdp”
+
+Paste it on the text file and upload it 
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/fd860c1e-150a-48dd-8319-fa97d9be9673)
+
+
+Press next
+In the “record delimiter”, press next
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/1672d56d-72c4-41ac-9516-e6a5c322d43a)
+
+
+
+In the “collection paths”, select “windows” for type. Put “C:\programdata\failed_rdp.log” for the “path”
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/8562a95a-1063-4420-9476-72d9470ee28e)
+
+
+Press next
+Names my custom log “FAILED_RDP_WITH_GEO”
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/c3e997a6-08f8-439e-aa96-c8d5439195d1)
+
+
+Finish creating
+
+To view the custom log, on the left panel, go to “Log” and look up the name of the log, which is “FAILED_RDP_WITH_GEO” and run:
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/da63ea7d-d9f5-418a-9ccb-672aef0c9c75)
+
+
+# Creating custom fields/extract fields from raw log data and training LAW
+
+
+we have more attempt login log data. Now, I will extract the certain fields from it and separating into different categories.
+ 
+To do this, expend and log, and clock 3 dots, and clisk “extrac field from …”
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/20aa37aa-599e-4fa4-ab50-0a1d4dc0d0e4)
+
+
+Highlight the latitude number, in the “field title” input “latitude” and select “numeric” for field type. And click extract. “Save extraction” if all looks correct.
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/4d79b513-298d-41b0-89ff-5a45c9016cfa)
+
+
+
+
+# Setting up amp in sentinel with latitude and longitude
+
+
+
