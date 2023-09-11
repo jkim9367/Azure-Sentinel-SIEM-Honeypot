@@ -192,3 +192,23 @@ Here is the example:
 
 # Turn Off the Firewall of the VM
 
+I am going to turn off the vm’s firewall to be vulnerable.  
+
+Open wf.msc 
+
+Click “windows defender firewall property” 
+
+Select firewall state: “off” for domain profile, private profile and public profile. 
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/6df978e6-f1ce-4536-85f8-11f5343ad353)
+
+
+Then I can test it by pinging the vm.
+If it is able to ping, it means firewall has been successfully turned off and it is now vulnerable. 
+
+
+![image](https://github.com/jkim9367/Azure-Sentinel-SIEM-Honeypot/assets/121040101/d68cd773-6961-485d-b559-f4d7e6a244df)
+
+
+
